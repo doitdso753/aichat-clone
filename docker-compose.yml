@@ -1,0 +1,87 @@
+services:
+  aichat-nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./aichat-app:/workspace/app
+      - ./aichat-api:/workspace/api
+    ports:
+      - "8001:80"
+      # - "443:443"
+    depends_on:
+      - aichat-api
+      - aichat-app
+    networks:
+      - aichat-network
+
+  aichat-api:
+    container_name: api
+    build:
+      context: ./aichat-api
+      dockerfile: Dockerfile
+    volumes:
+      - ./aichat-api:/workspace/api # 로컬 프로젝트 디렉토리를 컨테이너 작업 디렉토리(/api)로 마운트
+      - /workspace/app/node_modules  # node_modules는 별도의 볼륨으로 분리
+    environment:
+      - CHOKIDAR_USEPOLLING=true # 핫 리로딩 파일 변경 감지
+      - HOST=0.0.0.0 # 외부 접근 허용
+      - DB_HOST=127.0.0.1
+      - DB_PORT=5432
+      - DB_USER=admin
+      - DB_PASSWORD=admin123
+      - DB_NAME=chat_app
+    depends_on:
+      - aichat-db
+    ports:
+      - "5000:5000"
+    command: ["npm", "run", "dev"]
+    networks:
+      - aichat-network
+
+  aichat-app:
+    container_name: app
+    build:
+      context: ./aichat-app
+      dockerfile: Dockerfile
+    volumes:
+      - ./aichat-app:/workspace/app # 로컬 프로젝트 디렉토리를 컨테이너 작업 디렉토리(/app)로 마운트
+      - /workspace/api/node_modules  # node_modules는 별도의 볼륨으로 분리
+    environment:
+      - CHOKIDAR_USEPOLLING=true # 핫 리로딩 파일 변경 감지
+      - HOST=0.0.0.0 # 외부 접근 허용
+    ports:
+      - "3000:3000"
+    command: ["npm", "run", "dev"]
+    # depends_on:
+    #   - aichat-api
+    networks:
+      - aichat-network
+
+  aichat-db: 
+    image: mariadb:10.6.11
+    container_name: aichat-db
+    restart: always
+    volumes:
+      - ./database:/var/lib/mysql
+    ports:
+      - ${DB_PORT:-5432}:5432/tcp
+    networks:
+      - aichat-network
+    environment:
+      - TZ=Asia/Seoul
+      - MARIADB_ROOT_PASSWORD=rkqldk2025!@
+
+# volumes:
+#   db_data:
+
+networks:
+  aichat-network:
+    driver: bridge
+  
+# rabbitmq:
+#   image: rabbitmq:3-management
+#   ports:
+#     - "5672:5672" # RabbitMQ Port
+#     - "15672:15672" # 관리 대시보드 포트
