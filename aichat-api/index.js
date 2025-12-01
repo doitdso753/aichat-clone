@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-const PORT = 5000;
+const PORT = 3005;
 
 // 기본 라우트
 app.get('/', (req, res) => {
