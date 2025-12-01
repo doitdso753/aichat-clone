@@ -54,8 +54,8 @@ services:
     ports:
       - "3000:3000"
     command: ["npm", "run", "dev"]
-    # depends_on:
-    #   - aichat-api
+    depends_on:
+      - aichat-api
     networks:
       - aichat-network
 
