@@ -1,6 +1,4 @@
-# Supervisor
-supervisord.pid
-supervisord.log
+.venv/
 
 # Byte-compiled / optimized files
 __pycache__/

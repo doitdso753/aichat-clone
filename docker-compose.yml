@@ -50,7 +50,13 @@ services:
       - ./aichat-ai-api:/workspace/ai-api # 로컬 프로젝트 디렉토리를 컨테이너 작업 디렉토리(/api)로 마운트
     ports:
       - "3010:3010"
-    command: ["supervisord", "-c", "/workspace/ai-api/supervisor/supervisord.conf"]
+    command: ["uv", "run", "uvicorn",
+              "app.main:app",
+              "--host", "0.0.0.0",
+              "--port", "3010",
+              "--proxy-headers",
+              "--forwarded-allow-ips", "*"
+      ]
     networks:
       - aichat-network
 
