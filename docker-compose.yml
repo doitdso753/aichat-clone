@@ -28,9 +28,9 @@ services:
       - CHOKIDAR_USEPOLLING=true # 핫 리로딩 파일 변경 감지
       - HOST=0.0.0.0 # 외부 접근 허용
       - DB_HOST=127.0.0.1
-      - DB_PORT=5432
+      - DB_PORT=3306
       - DB_USER=admin
-      - DB_PASSWORD=admin123
+      - DB_PASSWORD=admin123!@
       - DB_NAME=chat_app
     depends_on:
       - aichat-db
@@ -79,12 +79,15 @@ services:
     volumes:
       - ./database:/var/lib/mysql
     ports:
-      - ${DB_PORT:-5432}:5432/tcp
+      - ${DB_PORT:-3306}:3306
     networks:
       - aichat-network
     environment:
       - TZ=Asia/Seoul
-      - MARIADB_ROOT_PASSWORD=rkqldk2025!@
+      - MARIADB_ROOT_PASSWORD=root123!@
+      - MARIADB_DATABASE=aichat_db
+      - MARIADB_USER=admin
+      - MARIADB_PASSWORD=admin123!@
 
 volumes:
  api_node_modules:
