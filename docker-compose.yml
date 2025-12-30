@@ -40,6 +40,19 @@ services:
     networks:
       - aichat-network
 
+  aichat-ai-api:
+    container_name: ai-api
+    build:
+      context: ./aichat-ai-api
+      dockerfile: Dockerfile
+    volumes:
+      - ./aichat-ai-api:/workspace/ai-api # 로컬 프로젝트 디렉토리를 컨테이너 작업 디렉토리(/api)로 마운트
+    ports:
+      - "3010:3010"
+    command: ["supervisord", "-c", "/workspace/ai-api/supervisor/supervisord.conf"]
+    networks:
+      - aichat-network
+
   aichat-app:
     container_name: app
     build:
